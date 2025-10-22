@@ -23,6 +23,7 @@ Thumbs.db
 
 # VS Code
 .vscode/
+/.vs/
 
 # EF Core
 *-*-Designer.cs
