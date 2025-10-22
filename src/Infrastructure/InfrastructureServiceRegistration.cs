@@ -17,7 +17,7 @@ namespace Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("BusReservationDb")));
+                options.UseNpgsql(configuration.GetConnectionString("BusTicketReservationSystemDb")));
 
             services.AddScoped<IBusScheduleRepository, BusScheduleRepository>();
 

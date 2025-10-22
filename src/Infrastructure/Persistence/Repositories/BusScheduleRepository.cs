@@ -18,14 +18,18 @@ namespace Infrastructure.Persistence.Repositories
         }
         public async Task<List<BusSchedule>> GetSchedulesByRouteAsync(string from, string to, DateTime journeyDate)
         {
-            var schedules = await _context.BusSchedules
+            var searchDate = DateTime.SpecifyKind(journeyDate.Date, DateTimeKind.Utc);
 
+            var schedules = await _context.BusSchedules
                 .Include(s => s.Bus)
+
                 .Include(s => s.Seats)
+
                 .Include(s => s.Route)
+
                 .Where(s => s.Route.From == from &&
                             s.Route.To == to &&
-                            s.DepartureTime.Date == journeyDate.Date)
+                            s.DepartureTime.Date == searchDate) 
 
                 .ToListAsync();
 

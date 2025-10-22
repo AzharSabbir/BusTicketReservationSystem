@@ -13,7 +13,6 @@ namespace Application
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<ISearchService, SearchService>();
-            // We will add more services here later (like IBookingService)
 
             return services;
         }
