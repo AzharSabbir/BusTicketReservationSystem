@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Contracts.Persistence;
+﻿using Application.Contracts.Persistence;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +14,14 @@ namespace Infrastructure
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("BusTicketReservationSystemDb")));
 
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddScoped<IBusScheduleRepository, BusScheduleRepository>();
+            services.AddScoped<ISeatRepository, SeatRepository>();
+            services.AddScoped<IPassengerRepository, PassengerRepository>();
+            services.AddScoped<ITicketRepository, TicketRepository>();
 
             return services;
         }

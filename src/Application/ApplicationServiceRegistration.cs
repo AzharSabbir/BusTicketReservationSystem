@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Application.Contracts;
+using Domain.Services;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Application.Contracts;
 
 namespace Application
 {
@@ -13,6 +14,8 @@ namespace Application
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<ISearchService, SearchService>();
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<SeatBookingService>();
 
             return services;
         }

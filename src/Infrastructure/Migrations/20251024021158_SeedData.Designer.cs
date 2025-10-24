@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251024021158_SeedData")]
+    partial class SeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,25 +97,6 @@ namespace Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Passenger", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Mobile")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Passengers");
-                });
-
             modelBuilder.Entity("Domain.Route", b =>
                 {
                     b.Property<Guid>("Id")
@@ -161,70 +145,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("BusScheduleId");
 
                     b.ToTable("Seats");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "A1",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a2a2a2a2-a2a2-a2a2-a2a2-a2a2a2a2a2a2"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "A2",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "B1",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "B2",
-                            Status = 0
-                        });
-                });
-
-            modelBuilder.Entity("Domain.Ticket", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("BoardingPoint")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("BusScheduleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DroppingPoint")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("PassengerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SeatId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusScheduleId");
-
-                    b.HasIndex("PassengerId");
-
-                    b.HasIndex("SeatId");
-
-                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Domain.BusSchedule", b =>
@@ -253,33 +173,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("BusScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Ticket", b =>
-                {
-                    b.HasOne("Domain.BusSchedule", "BusSchedule")
-                        .WithMany()
-                        .HasForeignKey("BusScheduleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Passenger", "Passenger")
-                        .WithMany()
-                        .HasForeignKey("PassengerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Seat", "Seat")
-                        .WithMany()
-                        .HasForeignKey("SeatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BusSchedule");
-
-                    b.Navigation("Passenger");
-
-                    b.Navigation("Seat");
                 });
 
             modelBuilder.Entity("Domain.BusSchedule", b =>

@@ -28,5 +28,14 @@ namespace Domain
             }
             return false; 
         }
+        public bool CancelBooking()
+        {
+            if (Status == SeatStatus.Booked)
+            {
+                Status = SeatStatus.Available;
+                return true; 
+            }
+            return false;
+        }
     }
 }

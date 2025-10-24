@@ -10,5 +10,6 @@ namespace Application.Contracts.Persistence
     public interface IBusScheduleRepository
     {
         Task<List<BusSchedule>> GetSchedulesByRouteAsync(string from, string to, DateTime journeyDate);
+        Task<BusSchedule?> GetScheduleWithBusAndSeatsAsync(Guid scheduleId);
     }
 }
