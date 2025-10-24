@@ -1,0 +1,151 @@
+/* Basic Reset & Font */
+:host {
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #e53935;
+    /* Red color for header */
+}
+
+/* Form Styling */
+.search-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: flex-end;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.btn-search {
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #e53935;
+    /* Red button */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-search:hover {
+    background-color: #c62828;
+}
+
+.btn-search:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Results Styling */
+.results-container {
+    margin-top: 30px;
+}
+
+.loading-spinner,
+.error-message,
+.no-results {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2rem;
+    color: #777;
+}
+
+.error-message {
+    color: #e53935;
+}
+
+/* Bus Card Styling */
+.bus-card {
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr;
+    align-items: center;
+    gap: 15px;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.bus-card h4 {
+    margin: 0 0 5px 0;
+    color: #000;
+}
+
+.bus-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.card-right {
+    text-align: right;
+}
+
+.card-right p:first-child {
+    margin-bottom: 5px;
+}
+
+.card-right strong {
+    color: #e53935;
+    font-size: 1.1rem;
+}
+
+.card-action {
+    text-align: right;
+}
+
+.btn-view-seats {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #e53935;
+    background-color: #fff;
+    border: 2px solid #e53935;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-view-seats:hover {
+    background-color: #e53935;
+    color: #fff;
+}
