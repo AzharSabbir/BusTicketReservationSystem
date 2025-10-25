@@ -33,8 +33,11 @@ namespace Application
                     StartTime = schedule.DepartureTime,    
                     ArrivalTime = schedule.ArrivalTime,    
                     Price = schedule.Price,                 
-                    SeatsLeft = seatsLeft                   
-                });
+                    SeatsLeft = seatsLeft,
+                    DepartureLocation = schedule.DepartureLocation,
+                    ArrivalLocation = schedule.ArrivalLocation,
+                    CancellationPolicy = schedule.Bus.CancellationPolicy
+                });
             }
             return results;
         }

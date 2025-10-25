@@ -1,7 +1,7 @@
 ﻿using Application.Contracts;
 using Application.Contracts.Persistence;
 using Domain;
-using Domain.Services; 
+using Domain.Services;
 
 namespace Application
 {
@@ -12,7 +12,7 @@ namespace Application
         private readonly IPassengerRepository _passengerRepository;
         private readonly ITicketRepository _ticketRepository;
         private readonly IBusScheduleRepository _busScheduleRepository;
-
+        private readonly IStopRepository _stopRepository; 
         private readonly SeatBookingService _seatBookingService;
 
         public BookingService(
@@ -21,6 +21,7 @@ namespace Application
             IPassengerRepository passengerRepository,
             ITicketRepository ticketRepository,
             IBusScheduleRepository busScheduleRepository,
+            IStopRepository stopRepository, 
             SeatBookingService seatBookingService)
         {
             _unitOfWork = unitOfWork;
@@ -28,6 +29,7 @@ namespace Application
             _passengerRepository = passengerRepository;
             _ticketRepository = ticketRepository;
             _busScheduleRepository = busScheduleRepository;
+            _stopRepository = stopRepository; 
             _seatBookingService = seatBookingService;
         }
 
@@ -40,6 +42,18 @@ namespace Application
                 return new SeatPlanDto(); 
             }
 
+            var allStops = await _stopRepository.GetStopsByRouteIdAsync(schedule.RouteId);
+
+            var boardingPoints = allStops
+                .Where(s => s.Type == StopType.Boarding)
+                .Select(s => new StopDto { Id = s.Id, Name = s.Name })
+                .ToList();
+
+            var droppingPoints = allStops
+                .Where(s => s.Type == StopType.Dropping)
+                .Select(s => new StopDto { Id = s.Id, Name = s.Name })
+                .ToList();
+
             var seatPlanDto = new SeatPlanDto
             {
                 BusScheduleId = schedule.Id,
@@ -48,8 +62,11 @@ namespace Application
                 {
                     SeatId = seat.Id,
                     SeatNumber = seat.SeatNumber,
-                    Status = seat.Status.ToString() 
-                }).ToList()
+                    Status = seat.Status.ToString()
+                }).ToList(),
+
+                BoardingPoints = boardingPoints,
+                DroppingPoints = droppingPoints
             };
 
             return seatPlanDto;
@@ -65,7 +82,6 @@ namespace Application
                 }
 
                 var passenger = new Passenger(input.PassengerName, input.PassengerMobile);
-
                 await _passengerRepository.AddAsync(passenger);
 
                 var newTicket = _seatBookingService.PerformBooking(
@@ -76,7 +92,7 @@ namespace Application
                 );
 
                 await _ticketRepository.AddAsync(newTicket);
-                await _seatRepository.UpdateAsync(seat); 
+                await _seatRepository.UpdateAsync(seat);
 
                 await _unitOfWork.SaveChangesAsync();
 
