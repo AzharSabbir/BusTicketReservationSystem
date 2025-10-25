@@ -8,10 +8,17 @@ export interface SeatDto {
   status: string;
 }
 
+export interface StopDto {
+  id: string;
+  name: string;
+}
+
 export interface SeatPlanDto {
   busScheduleId: string;
   busName: string;
   seats: SeatDto[];
+  boardingPoints: StopDto[];
+  droppingPoints: StopDto[];
 }
 
 export interface BookSeatInputDto {

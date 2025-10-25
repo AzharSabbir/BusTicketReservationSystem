@@ -10,6 +10,9 @@ export interface AvailableBusDto {
   arrivalTime: Date;
   seatsLeft: number;
   price: number;
+  departureLocation: string;
+  arrivalLocation: string;
+  cancellationPolicy: string;
 }
 
 @Injectable({
