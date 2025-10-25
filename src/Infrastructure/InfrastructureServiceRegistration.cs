@@ -22,6 +22,7 @@ namespace Infrastructure
             services.AddScoped<ISeatRepository, SeatRepository>();
             services.AddScoped<IPassengerRepository, PassengerRepository>();
             services.AddScoped<ITicketRepository, TicketRepository>();
+            services.AddScoped<IStopRepository, StopRepository>();
 
             return services;
         }

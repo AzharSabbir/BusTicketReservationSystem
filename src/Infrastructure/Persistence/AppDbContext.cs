@@ -20,6 +20,7 @@ namespace Infrastructure.Persistence
         public DbSet<Seat> Seats { get; set; }
         public DbSet<Passenger> Passengers { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Stop> Stops { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,14 +36,17 @@ namespace Infrastructure.Persistence
             );
 
             modelBuilder.Entity<Bus>().HasData(
-                new Bus("National Travels", "NON AC - 101", 40) { Id = busId }
+                new Bus("National Travels", "NON AC - 101", 40, "4 hours before departure") { Id = busId }
             );
 
             modelBuilder.Entity<BusSchedule>().HasData(
                 new BusSchedule(busId, routeId,
                     new DateTime(2025, 10, 23, 6, 0, 0, DateTimeKind.Utc),
                     new DateTime(2025, 10, 23, 13, 30, 0, DateTimeKind.Utc),
-                    700m)
+                    700m,
+                    "Kallyanpur",
+                    "Chapai Nawabganj"
+                )
                 {
                     Id = scheduleId
                 }
@@ -53,6 +57,15 @@ namespace Infrastructure.Persistence
                 new Seat(scheduleId, "A2") { Id = Guid.Parse("a2a2a2a2-a2a2-a2a2-a2a2-a2a2a2a2a2a2") },
                 new Seat(scheduleId, "B1") { Id = Guid.Parse("b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1") },
                 new Seat(scheduleId, "B2") { Id = Guid.Parse("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2") }
+            );
+
+            modelBuilder.Entity<Stop>().HasData(
+                new Stop(routeId, "[06:00 AM] Kallyanpur counter", StopType.Boarding) { Id = Guid.Parse("c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1") },
+                new Stop(routeId, "[06:15 AM] Mohakhali counter", StopType.Boarding) { Id = Guid.Parse("c2c2c2c2-c2c2-c2c2-c2c2-c2c2c2c2c2c2") },
+
+                new Stop(routeId, "[10:30 AM] Baneshore Counter", StopType.Dropping) { Id = Guid.Parse("d1d1d1d1-d1d1-d1d1-d1d1-d1d1d1d1d1d1") },
+                new Stop(routeId, "[12:30 PM] Rajshahi Counter", StopType.Dropping) { Id = Guid.Parse("d2d2d2d2-d2d2-d2d2-d2d2-d2d2d2d2d2d2") },
+                new Stop(routeId, "[01:00 PM] Rajabari Counter", StopType.Dropping) { Id = Guid.Parse("d3d3d3d3-d3d3-d3d3-d3d3-d3d3d3d3d3d3") }
             );
         }
     }
