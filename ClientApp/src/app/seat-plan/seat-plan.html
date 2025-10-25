@@ -1,1 +1,81 @@
-<p>seat-plan works!</p>
+<div class="container">
+
+    <button (click)="goBack()" class="btn-back">&larr; Modify Search</button>
+
+    <div *ngIf="isLoading" class="loading-spinner">Loading seat plan...</div>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <div *ngIf="seatPlan && !isLoading">
+        <header>
+            <h2>Select Your Seats</h2>
+            <h3>{{ seatPlan.busName }}</h3>
+        </header>
+
+        <div class="seat-plan-container">
+
+            <div class="seat-grid-wrapper">
+                <p>Click on an available seat to select</p>
+                <div class="seat-grid">
+                    <div *ngFor="let seat of seatPlan.seats" class="seat" [ngClass]="{
+              'available': seat.status === 'Available',
+              'booked': seat.status === 'Booked',
+              'sold': seat.status === 'Sold',
+              'selected': seat.seatId === selectedSeat?.seatId
+            }" (click)="selectSeat(seat)">
+                        {{ seat.seatNumber }}
+                    </div>
+                </div>
+                <div class="seat-legend">
+                    <span class="seat available"></span> Available
+                    <span class="seat booked"></span> Booked
+                    <span class="seat selected"></span> Selected
+                </div>
+            </div>
+
+            <div class="booking-form-wrapper">
+                <h4>Passenger Details</h4>
+
+                <div *ngIf="!selectedSeat" class="no-seat-selected">
+                    Please select an available seat to book.
+                </div>
+
+                <form *ngIf="selectedSeat" #bookingForm="ngForm" (ngSubmit)="onBookingSubmit(bookingForm)">
+                    <div class="form-group">
+                        <label>Selected Seat</label>
+                        <input type="text" [value]="selectedSeat.seatNumber" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" [(ngModel)]="passengerName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="text" id="mobile" name="mobile" [(ngModel)]="passengerMobile" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="boarding">Boarding Point</label>
+                        <input type="text" id="boarding" name="boarding" [(ngModel)]="boardingPoint" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dropping">Dropping Point</label>
+                        <input type="text" id="dropping" name="dropping" [(ngModel)]="droppingPoint" required>
+                    </div>
+
+                    <button type="submit" class="btn-confirm" [disabled]="bookingForm.invalid || isBooking">
+                        {{ isBooking ? 'Booking...' : 'Confirm Booking' }}
+                    </button>
+                </form>
+
+                <div *ngIf="bookingResult" class="booking-result"
+                    [ngClass]="bookingResult.success ? 'success' : 'error'">
+                    {{ bookingResult.message }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
