@@ -14,6 +14,9 @@ namespace Application.Contracts
         public DateTime StartTime { get; set; } 
         public DateTime ArrivalTime { get; set; } 
         public int SeatsLeft { get; set; }      
-        public decimal Price { get; set; }       
+        public decimal Price { get; set; }
+        public string DepartureLocation { get; set; }
+        public string ArrivalLocation { get; set; }
+        public string CancellationPolicy { get; set; }
     }
 }

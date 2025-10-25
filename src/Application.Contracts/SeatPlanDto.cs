@@ -11,5 +11,7 @@ namespace Application.Contracts
         public Guid BusScheduleId { get; set; }
         public string BusName { get; set; }
         public List<SeatDto> Seats { get; set; } = new List<SeatDto>();
+        public List<StopDto> BoardingPoints { get; set; } = new List<StopDto>();
+        public List<StopDto> DroppingPoints { get; set; } = new List<StopDto>();
     }
 }
