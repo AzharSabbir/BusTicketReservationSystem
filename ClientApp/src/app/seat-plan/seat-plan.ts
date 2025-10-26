@@ -12,9 +12,12 @@ import { BookingService, SeatPlanDto, SeatDto, BookSeatInputDto, StopDto } from 
   styleUrls: ['./seat-plan.css']
 })
 export class SeatPlan implements OnInit {
+
   seatPlan: SeatPlanDto | null = null;
   isLoading = true;
   errorMessage: string | null = null;
+  seatRows: SeatDto[][] = [];
+
   selectedSeat: SeatDto | null = null;
   passengerName = '';
   passengerMobile = '';
@@ -37,10 +40,11 @@ export class SeatPlan implements OnInit {
       this.bookingService.getSeatPlan(scheduleId).subscribe({
         next: (data) => {
           this.seatPlan = data;
+          this.groupSeatsIntoRows();
           this.isLoading = false;
         },
         error: (err) => {
-          console.error(err);
+          console.error("Error loading seat plan:", err);
           this.errorMessage = 'Could not load seat plan. Please try again.';
           this.isLoading = false;
         }
@@ -48,6 +52,27 @@ export class SeatPlan implements OnInit {
     } else {
       this.errorMessage = 'No schedule ID provided.';
       this.isLoading = false;
+    }
+  }
+
+  private groupSeatsIntoRows(): void {
+    this.seatRows = [];
+    if (this.seatPlan?.seats) {
+      const sortedSeats = [...this.seatPlan.seats].sort((a, b) => {
+        const rowA = a.seatNumber.charAt(0);
+        const colA = parseInt(a.seatNumber.substring(1), 10);
+        const rowB = b.seatNumber.charAt(0);
+        const colB = parseInt(b.seatNumber.substring(1), 10);
+
+        if (rowA < rowB) return -1;
+        if (rowA > rowB) return 1;
+
+        return colA - colB;
+      });
+
+      for (let i = 0; i < sortedSeats.length; i += 4) {
+        this.seatRows.push(sortedSeats.slice(i, i + 4));
+      }
     }
   }
 
@@ -64,7 +89,8 @@ export class SeatPlan implements OnInit {
 
   onBookingSubmit(form: NgForm): void {
     if (form.invalid || !this.selectedSeat || !this.seatPlan || !this.boardingPoint || !this.droppingPoint) {
-      console.error("Form is invalid or points not selected");
+      console.error("Form is invalid, seat not selected, or points missing.");
+      this.bookingResult = { success: false, message: 'Please select a seat, boarding point, dropping point, and fill in all required fields.' };
       return;
     }
 
@@ -75,12 +101,11 @@ export class SeatPlan implements OnInit {
     const dropStopName = this.seatPlan.droppingPoints.find(p => p.id === this.droppingPoint)?.name || '';
 
     if (!boardStopName || !dropStopName) {
-      console.error("Could not find stop names for selected IDs");
+      console.error("Could not find stop names for selected IDs.");
       this.bookingResult = { success: false, message: 'Invalid boarding or dropping point selected.' };
       this.isBooking = false;
       return;
     }
-
 
     const input: BookSeatInputDto = {
       busScheduleId: this.seatPlan.busScheduleId,
@@ -94,17 +119,23 @@ export class SeatPlan implements OnInit {
     this.bookingService.bookSeat(input).subscribe({
       next: (result) => {
         this.isBooking = false;
-        if (result.success) {
+        if (result.success && this.seatPlan && this.selectedSeat) {
           this.bookingResult = { success: true, message: `Success! Seat ${result.seatNumber} is booked. Ticket ID: ${result.ticketId}` };
-          const bookedSeatInPlan = this.seatPlan?.seats.find(s => s.seatId === this.selectedSeat?.seatId);
+
+          const bookedSeatInPlan = this.seatPlan.seats.find(s => s.seatId === this.selectedSeat?.seatId);
+
           if (bookedSeatInPlan) {
             bookedSeatInPlan.status = 'Booked';
           }
+
           this.selectedSeat = null;
+
+          this.groupSeatsIntoRows();
+
           form.resetForm();
 
         } else {
-          this.bookingResult = { success: false, message: result.message || 'Booking failed. Please try again.' };
+          this.bookingResult = { success: false, message: result.message || 'Booking failed. Seat might have been taken.' };
         }
       },
       error: (err) => {
@@ -117,7 +148,7 @@ export class SeatPlan implements OnInit {
   }
 
   trackBySeatId(index: number, seat: SeatDto): string {
-    return seat.seatId; // Use the unique seatId for tracking
+    return seat.seatId;
   }
 
   goBack(): void {

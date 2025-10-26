@@ -21,14 +21,20 @@
                 </div>
 
                 <div class="seat-grid">
-                    <div *ngFor="let seat of seatPlan.seats; let i = index; trackBy: trackBySeatId" class="seat"
-                        [ngClass]="{
-          'available': seat.status === 'Available',
-          'booked': seat.status === 'Booked' || seat.status === 'Sold',
-          'selected': seat.seatId === selectedSeat?.seatId
-        }" (click)="selectSeat(seat)">
-                        {{ seat.seatNumber }}
-                    </div>
+                    <ng-container *ngFor="let row of seatRows; let rowIndex = index">
+                        <div *ngFor="let seat of row; let seatIndex = index; trackBy: trackBySeatId" class="seat"
+                            [ngClass]="{
+                   'available': seat.status === 'Available',
+                   'booked': seat.status === 'Booked' || seat.status === 'Sold',
+                   'selected': seat.seatId === selectedSeat?.seatId,
+                   'grid-col-1': seatIndex === 0, 
+                   'grid-col-2': seatIndex === 1, 
+                   'grid-col-4': seatIndex === 2, 
+                   'grid-col-5': seatIndex === 3  
+                 }" (click)="selectSeat(seat)">
+                            {{ seat.seatNumber }}
+                        </div>
+                    </ng-container>
                 </div>
                 <p class="instruction-text">Click on an available seat to select</p>
             </div>
