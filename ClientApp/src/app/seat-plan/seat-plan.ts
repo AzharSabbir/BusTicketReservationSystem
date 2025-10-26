@@ -116,6 +116,10 @@ export class SeatPlan implements OnInit {
     });
   }
 
+  trackBySeatId(index: number, seat: SeatDto): string {
+    return seat.seatId; // Use the unique seatId for tracking
+  }
+
   goBack(): void {
     this.router.navigate(['/']);
   }
