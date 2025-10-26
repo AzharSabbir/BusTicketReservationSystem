@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Application.Contracts;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {

@@ -2,7 +2,7 @@
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq; // Needed for .Any()
+using System.Linq; 
 
 namespace Application.UnitTests
 {
@@ -10,18 +10,14 @@ namespace Application.UnitTests
     {
         public static AppDbContext Create()
         {
-            // 1. Set up options for an in-memory database.
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
-            // 2. Create the DbContext instance.
             var context = new AppDbContext(options);
 
-            // 3. Ensure the database schema is created based on the DbContext model.
             context.Database.EnsureCreated();
 
-            // 4. Seed data explicitly for tests.
             SeedData(context);
 
             return context;
@@ -29,42 +25,37 @@ namespace Application.UnitTests
 
         private static void SeedData(AppDbContext context)
         {
-            // IDs for Route, Bus, Schedule
             var routeId = Guid.Parse("ee2add3e-f635-4340-bb3c-9148d8a7c2e3");
             var busId = Guid.Parse("a548238b-d20f-488f-a0e2-763d3f94628f");
             var scheduleId = Guid.Parse("b11c34a1-0e31-4ff5-9464-3e91501b8495");
 
-            // Seed Route (if not already present)
             if (!context.Routes.Any(r => r.Id == routeId))
             {
                 context.Routes.Add(new Route("Dhaka", "Rajshahi") { Id = routeId });
             }
 
-            // Seed Bus (if not already present)
             if (!context.Buses.Any(b => b.Id == busId))
             {
-                context.Buses.Add(new Bus("National Travels", "NON AC - 101", 4, "4 hours before departure") { Id = busId }); // Consistent 4 seats
+                context.Buses.Add(new Bus("National Travels", "NON AC - 101", 4, "4 hours before departure") { Id = busId }); 
             }
 
-            // Seed BusSchedule (if not already present - with ALL constructor arguments)
             if (!context.BusSchedules.Any(bs => bs.Id == scheduleId))
             {
                 context.BusSchedules.Add(new BusSchedule(
                     busId,
                     routeId,
-                    new DateTime(2025, 10, 23, 6, 0, 0, DateTimeKind.Utc), // DepartureTime
-                    new DateTime(2025, 10, 23, 13, 30, 0, DateTimeKind.Utc), // ArrivalTime
-                    700m,  // Price
-                    "Kallyanpur", // DepartureLocation
-                    "Chapai Nawabganj", // ArrivalLocation
-                    20m,   // ServiceCharge
-                    28m,   // PGWCharge
-                    48m    // Discount
+                    new DateTime(2025, 10, 23, 6, 0, 0, DateTimeKind.Utc), 
+                    new DateTime(2025, 10, 23, 13, 30, 0, DateTimeKind.Utc), 
+                    700m,  
+                    "Kallyanpur", 
+                    "Chapai Nawabganj",
+                    20m,   
+                    28m,  
+                    48m    
                 )
                 { Id = scheduleId });
             }
 
-            // Seed Seats (if not already present for this schedule)
             if (!context.Seats.Any(s => s.BusScheduleId == scheduleId))
             {
                 context.Seats.AddRange(
@@ -75,7 +66,6 @@ namespace Application.UnitTests
                 );
             }
 
-            // Seed Stops (if not already present for this route)
             if (!context.Stops.Any(st => st.RouteId == routeId))
             {
                 context.Stops.AddRange(
@@ -87,11 +77,8 @@ namespace Application.UnitTests
                 );
             }
 
-            // Save the seeded data to the in-memory database
             context.SaveChanges();
         }
-
-        // Method to destroy the context after a test
         public static void Destroy(AppDbContext context)
         {
             context.Database.EnsureDeleted();
