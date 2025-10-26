@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251025034546_AddStopsAndPolicy")]
-    partial class AddStopsAndPolicy
+    [Migration("20251026020009_AddNewFareComponents")]
+    partial class AddNewFareComponents
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,16 +49,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Buses");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a548238b-d20f-488f-a0e2-763d3f94628f"),
-                            BusName = "NON AC - 101",
-                            CancellationPolicy = "4 hours before departure",
-                            CompanyName = "National Travels",
-                            TotalSeats = 40
-                        });
                 });
 
             modelBuilder.Entity("Domain.BusSchedule", b =>
@@ -84,11 +74,20 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("DepartureTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("PGWCharge")
+                        .HasColumnType("numeric");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<Guid>("RouteId")
                         .HasColumnType("uuid");
+
+                    b.Property<decimal>("ServiceCharge")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -97,19 +96,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("RouteId");
 
                     b.ToTable("BusSchedules");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            ArrivalLocation = "Chapai Nawabganj",
-                            ArrivalTime = new DateTime(2025, 10, 23, 13, 30, 0, 0, DateTimeKind.Utc),
-                            BusId = new Guid("a548238b-d20f-488f-a0e2-763d3f94628f"),
-                            DepartureLocation = "Kallyanpur",
-                            DepartureTime = new DateTime(2025, 10, 23, 6, 0, 0, 0, DateTimeKind.Utc),
-                            Price = 700m,
-                            RouteId = new Guid("ee2add3e-f635-4340-bb3c-9148d8a7c2e3")
-                        });
                 });
 
             modelBuilder.Entity("Domain.Passenger", b =>
@@ -148,14 +134,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Routes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("ee2add3e-f635-4340-bb3c-9148d8a7c2e3"),
-                            From = "Dhaka",
-                            To = "Rajshahi"
-                        });
                 });
 
             modelBuilder.Entity("Domain.Seat", b =>
@@ -179,36 +157,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("BusScheduleId");
 
                     b.ToTable("Seats");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "A1",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a2a2a2a2-a2a2-a2a2-a2a2-a2a2a2a2a2a2"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "A2",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "B1",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"),
-                            BusScheduleId = new Guid("b11c34a1-0e31-4ff5-9464-3e91501b8495"),
-                            SeatNumber = "B2",
-                            Status = 0
-                        });
                 });
 
             modelBuilder.Entity("Domain.Stop", b =>
@@ -230,43 +178,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Stops");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1"),
-                            Name = "[06:00 AM] Kallyanpur counter",
-                            RouteId = new Guid("ee2add3e-f635-4340-bb3c-9148d8a7c2e3"),
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("c2c2c2c2-c2c2-c2c2-c2c2-c2c2c2c2c2c2"),
-                            Name = "[06:15 AM] Mohakhali counter",
-                            RouteId = new Guid("ee2add3e-f635-4340-bb3c-9148d8a7c2e3"),
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("d1d1d1d1-d1d1-d1d1-d1d1-d1d1d1d1d1d1"),
-                            Name = "[10:30 AM] Baneshore Counter",
-                            RouteId = new Guid("ee2add3e-f635-4340-bb3c-9148d8a7c2e3"),
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = new Guid("d2d2d2d2-d2d2-d2d2-d2d2-d2d2d2d2d2d2"),
-                            Name = "[12:30 PM] Rajshahi Counter",
-                            RouteId = new Guid("ee2add3e-f635-4340-bb3c-9148d8a7c2e3"),
-                            Type = 1
-                        },
-                        new
-                        {
-                            Id = new Guid("d3d3d3d3-d3d3-d3d3-d3d3-d3d3d3d3d3d3"),
-                            Name = "[01:00 PM] Rajabari Counter",
-                            RouteId = new Guid("ee2add3e-f635-4340-bb3c-9148d8a7c2e3"),
-                            Type = 1
-                        });
                 });
 
             modelBuilder.Entity("Domain.Ticket", b =>

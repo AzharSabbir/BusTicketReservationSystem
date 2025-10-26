@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { SearchService, AvailableBusDto } from '../services/search';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -12,22 +12,29 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./search.css']
 })
 export class SearchComponent {
-  // 1. Variables to hold our form data
   searchModel = {
     from: 'Dhaka',
     to: 'Rajshahi',
-    journeyDate: this.getTodayDateString() // Default to today
+    journeyDate: this.getTodayDateString()
   };
 
-  // 2. Variables to hold our results
   searchResults: AvailableBusDto[] = [];
   isLoading = false;
   searchError: string | null = null;
+  hasSearched = false;
 
-  // 3. Inject our new SearchService
-  constructor(private searchService: SearchService) { }
+  totalBusesFound = 0;
+  totalOperatorsFound = '--';
+  totalSeatsAvailable = '--';
 
-  // 4. The function to call when the form is submitted
+  currentSortCriteria = 'DEPARTURE TIME';
+  sortAscending = true;
+
+  constructor(
+    private searchService: SearchService,
+    private router: Router
+  ) { }
+
   onSearchSubmit(form: NgForm) {
     if (form.invalid) {
       return;
@@ -35,7 +42,9 @@ export class SearchComponent {
 
     this.isLoading = true;
     this.searchError = null;
-    this.searchResults = []; // Clear old results
+    this.searchResults = [];
+    this.hasSearched = true;
+    this.totalBusesFound = 0;
 
     this.searchService.searchAvailableBuses(
       this.searchModel.from,
@@ -44,6 +53,8 @@ export class SearchComponent {
     ).subscribe({
       next: (results) => {
         this.searchResults = results;
+        this.totalBusesFound = results.length;
+        this.sortResults(this.currentSortCriteria, false);
         this.isLoading = false;
       },
       error: (err) => {
@@ -54,11 +65,43 @@ export class SearchComponent {
     });
   }
 
-  // Helper function to get today's date in YYYY-MM-DD format
+  sortResults(criteria: string, toggleDirection = true): void {
+    if (this.currentSortCriteria === criteria && toggleDirection) {
+      this.sortAscending = !this.sortAscending;
+    } else {
+      this.currentSortCriteria = criteria;
+      this.sortAscending = true;
+    }
+
+    this.searchResults.sort((a, b) => {
+      let compare = 0;
+      switch (criteria) {
+        case 'DEPARTURE TIME':
+          compare = new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+          break;
+        case 'AVAILABLE SEATS':
+          compare = a.seatsLeft - b.seatsLeft;
+          break;
+        case 'FARE':
+          compare = a.price - b.price;
+          break;
+      }
+      return this.sortAscending ? compare : compare * -1;
+    });
+  }
+
+  modifySearch(): void {
+    this.searchResults = [];
+    this.hasSearched = false;
+    this.totalBusesFound = 0;
+    console.log("Modify search clicked - clearing results for now.");
+  }
+
+
   private getTodayDateString(): string {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   }

@@ -11,11 +11,9 @@ namespace Application.Contracts
         public Guid BusScheduleId { get; set; }
         public Guid SeatId { get; set; }
 
-        // Passenger Details
         public string PassengerName { get; set; }
         public string PassengerMobile { get; set; }
 
-        // Boarding/Dropping
         public string BoardingPoint { get; set; }
         public string DroppingPoint { get; set; }
     }

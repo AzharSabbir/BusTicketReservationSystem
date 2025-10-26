@@ -19,6 +19,10 @@ export interface SeatPlanDto {
   seats: SeatDto[];
   boardingPoints: StopDto[];
   droppingPoints: StopDto[];
+  seatFare: number;
+  serviceCharge: number;
+  pgwCharge: number;
+  discount: number;
 }
 
 export interface BookSeatInputDto {

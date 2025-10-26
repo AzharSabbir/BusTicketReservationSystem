@@ -17,6 +17,9 @@ namespace Domain
         public DateTime DepartureTime { get; private set; }
         public DateTime ArrivalTime { get; private set; }
         public decimal Price { get; private set; }
+        public decimal ServiceCharge { get; private set; }
+        public decimal PGWCharge { get; private set; }
+        public decimal Discount { get; private set; }
 
         public string DepartureLocation { get; private set; }  
         public string ArrivalLocation { get; private set; }

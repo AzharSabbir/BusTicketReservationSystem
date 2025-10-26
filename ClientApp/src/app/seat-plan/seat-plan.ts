@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router'; // Import Router
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
-import { BookingService, SeatPlanDto, SeatDto, BookSeatInputDto } from '../services/booking';
+import { BookingService, SeatPlanDto, SeatDto, BookSeatInputDto, StopDto } from '../services/booking';
 
 @Component({
   selector: 'app-seat-plan',
@@ -12,35 +12,28 @@ import { BookingService, SeatPlanDto, SeatDto, BookSeatInputDto } from '../servi
   styleUrls: ['./seat-plan.css']
 })
 export class SeatPlan implements OnInit {
-
-  // Data
   seatPlan: SeatPlanDto | null = null;
   isLoading = true;
   errorMessage: string | null = null;
-
-  // Booking Form
   selectedSeat: SeatDto | null = null;
   passengerName = '';
   passengerMobile = '';
-  boardingPoint = 'Kallyanpur'; // Default boarding point
-  droppingPoint = 'Rajshahi Counter'; // Default dropping point
+  boardingPoint: string | null = null;
+  droppingPoint: string | null = null;
 
-  // Booking State
   isBooking = false;
   bookingResult: { success: boolean, message: string } | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router, // Inject Router for navigation
+    private router: Router,
     private bookingService: BookingService
   ) { }
 
   ngOnInit(): void {
-    // 1. Get scheduleId from the URL
     const scheduleId = this.route.snapshot.paramMap.get('scheduleId');
 
     if (scheduleId) {
-      // 2. Fetch the seat plan
       this.bookingService.getSeatPlan(scheduleId).subscribe({
         next: (data) => {
           this.seatPlan = data;
@@ -53,62 +46,77 @@ export class SeatPlan implements OnInit {
         }
       });
     } else {
-      // Handle case where no ID is provided
       this.errorMessage = 'No schedule ID provided.';
       this.isLoading = false;
     }
   }
 
-  // 3. Handle clicking on a seat
   selectSeat(seat: SeatDto): void {
     if (seat.status === 'Available') {
-      this.selectedSeat = seat;
-      this.bookingResult = null; // Clear old booking results
+      if (this.selectedSeat?.seatId === seat.seatId) {
+        this.selectedSeat = null;
+      } else {
+        this.selectedSeat = seat;
+      }
+      this.bookingResult = null;
     }
   }
 
-  // 4. Handle the "Confirm Booking" submission
   onBookingSubmit(form: NgForm): void {
-    if (form.invalid || !this.selectedSeat || !this.seatPlan) {
+    if (form.invalid || !this.selectedSeat || !this.seatPlan || !this.boardingPoint || !this.droppingPoint) {
+      console.error("Form is invalid or points not selected");
       return;
     }
 
     this.isBooking = true;
     this.bookingResult = null;
 
+    const boardStopName = this.seatPlan.boardingPoints.find(p => p.id === this.boardingPoint)?.name || '';
+    const dropStopName = this.seatPlan.droppingPoints.find(p => p.id === this.droppingPoint)?.name || '';
+
+    if (!boardStopName || !dropStopName) {
+      console.error("Could not find stop names for selected IDs");
+      this.bookingResult = { success: false, message: 'Invalid boarding or dropping point selected.' };
+      this.isBooking = false;
+      return;
+    }
+
+
     const input: BookSeatInputDto = {
       busScheduleId: this.seatPlan.busScheduleId,
       seatId: this.selectedSeat.seatId,
       passengerName: this.passengerName,
       passengerMobile: this.passengerMobile,
-      boardingPoint: this.boardingPoint,
-      droppingPoint: this.droppingPoint
+      boardingPoint: boardStopName,
+      droppingPoint: dropStopName
     };
 
-    // 5. Call the booking service
     this.bookingService.bookSeat(input).subscribe({
       next: (result) => {
         this.isBooking = false;
         if (result.success) {
           this.bookingResult = { success: true, message: `Success! Seat ${result.seatNumber} is booked. Ticket ID: ${result.ticketId}` };
-          // Update the UI
-          if (this.selectedSeat) {
-            this.selectedSeat.status = 'Booked';
-            this.selectedSeat = null; // Clear selection
+          const bookedSeatInPlan = this.seatPlan?.seats.find(s => s.seatId === this.selectedSeat?.seatId);
+          if (bookedSeatInPlan) {
+            bookedSeatInPlan.status = 'Booked';
           }
+          this.selectedSeat = null;
+          form.resetForm();
+
         } else {
-          this.bookingResult = { success: false, message: result.message };
+          this.bookingResult = { success: false, message: result.message || 'Booking failed. Please try again.' };
         }
       },
       error: (err) => {
+        console.error("Booking API error:", err);
         this.isBooking = false;
-        this.bookingResult = { success: false, message: err.error.message || 'An error occurred during booking.' };
+        const errorMsg = err?.error?.message || err?.message || 'An unexpected error occurred during booking.';
+        this.bookingResult = { success: false, message: errorMsg };
       }
     });
   }
 
-  // Helper to go back to search
   goBack(): void {
-    this.router.navigate(['/']); // Navigate to home
+    this.router.navigate(['/']);
   }
 }

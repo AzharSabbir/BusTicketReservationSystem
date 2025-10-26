@@ -11,7 +11,6 @@ namespace WebApi.Controllers
     {
         private readonly IBookingService _bookingService;
 
-        // 1. Inject the IBookingService
         public BookingController(IBookingService bookingService)
         {
             _bookingService = bookingService;

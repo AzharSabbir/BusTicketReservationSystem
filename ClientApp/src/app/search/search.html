@@ -4,22 +4,18 @@
     </header>
 
     <form class="search-form" #searchForm="ngForm" (ngSubmit)="onSearchSubmit(searchForm)">
-
         <div class="form-group">
             <label for="from">GOING FROM</label>
             <input type="text" id="from" name="from" [(ngModel)]="searchModel.from" required>
         </div>
-
         <div class="form-group">
             <label for="to">GOING TO</label>
             <input type="text" id="to" name="to" [(ngModel)]="searchModel.to" required>
         </div>
-
         <div class="form-group">
             <label for="journeyDate">JOURNEY DATE</label>
             <input type="date" id="journeyDate" name="journeyDate" [(ngModel)]="searchModel.journeyDate" required>
         </div>
-
         <div class="form-group">
             <button type="submit" class="btn-search" [disabled]="searchForm.invalid || isLoading">
                 {{ isLoading ? 'Searching...' : 'Search Bus' }}
@@ -37,33 +33,77 @@
             {{ searchError }}
         </div>
 
-        <div *ngIf="!isLoading && searchResults.length === 0 && !searchError" class="no-results">
+        <div *ngIf="hasSearched && !isLoading && searchResults.length === 0 && !searchError" class="no-results">
             No buses found for this route.
         </div>
 
         <div *ngIf="!isLoading && searchResults.length > 0" class="results-list">
-            <h3>Available Buses ({{ searchResults.length }})</h3>
 
-            <div *ngFor="let bus of searchResults" class="bus-card">
-                <div class="card-left">
-                    <h4>{{ bus.companyName }}</h4>
-                    <p>{{ bus.busName }}</p>
+            <div class="results-header">
+                <div class="route-info">
+                    <h3>ONWARD</h3>
+                    <p>{{ searchModel.from }} To {{ searchModel.to }} On {{ searchModel.journeyDate | date: 'dd MMM
+                        yyyy' }}</p>
                 </div>
-                <div class="card-middle">
-                    <p><strong>Starts:</strong> {{ bus.startTime | date: 'shortTime' }}</p>
-                    <p><strong>Arrives:</strong> {{ bus.arrivalTime | date: 'shortTime' }}</p>
-                </div>
-                <div class="card-right">
-                    <p>Seats Left: <strong>{{ bus.seatsLeft }}</strong></p>
-                    <p>Price: <strong>{{ bus.price | currency: '৳' }}</strong></p>
-                </div>
-                <div class="card-action">
-                    <a class="btn-view-seats" [routerLink]="['/seat-plan', bus.busScheduleId]">
-                        View Seats
-                    </a>
+                <span style="color: white;">Total Buses Found: {{ totalBusesFound }}</span>
+            </div>
+
+            <div class="results-controls">
+                <div class="sort-options">
+                    <strong>SORT BY:</strong>
+                    <span class="sort-option-dt" (click)="sortResults('DEPARTURE TIME')"
+                        [class.active-sort]="currentSortCriteria === 'DEPARTURE TIME'">
+                        DEPARTURE TIME <span
+                            [innerHTML]="currentSortCriteria === 'DEPARTURE TIME' ? (sortAscending ? '&#9650;' : '&#9660;') : '&#9679;'"></span>
+                    </span>
+                    <span class="sort-option-as" (click)="sortResults('AVAILABLE SEATS')"
+                        [class.active-sort]="currentSortCriteria === 'AVAILABLE SEATS'">
+                        AVAILABLE SEATS <span
+                            [innerHTML]="currentSortCriteria === 'AVAILABLE SEATS' ? (sortAscending ? '&#9650;' : '&#9660;') : '&#9679;'"></span>
+                    </span>
+                    <span class="sort-option-f" (click)="sortResults('FARE')"
+                        [class.active-sort]="currentSortCriteria === 'FARE'">
+                        FARE <span
+                            [innerHTML]="currentSortCriteria === 'FARE' ? (sortAscending ? '&#9650;' : '&#9660;') : '&#9679;'"></span>
+                    </span>
                 </div>
             </div>
 
+            <div *ngFor="let bus of searchResults" class="bus-card">
+
+                <div class="card-bus-info">
+                    <h4>{{ bus.companyName }}</h4>
+                    <p>{{ bus.busName }}</p>
+                    <small class="cancellation-policy">{{ bus.cancellationPolicy }}</small>
+                </div>
+
+                <div class="card-time-location">
+                    <small>Starting</small>
+                    <p><strong>{{ bus.startTime | date: 'shortTime' }}</strong></p>
+                    <small>{{ bus.departureLocation }}</small>
+                </div>
+
+                <div class="card-seats">
+                    <small>Seats Left: {{ bus.seatsLeft }}</small>
+                </div>
+
+                <div class="card-time-location">
+                    <small>Arrival</small>
+                    <p><strong>{{ bus.arrivalTime | date: 'shortTime' }}</strong></p>
+                    <small>{{ bus.arrivalLocation }}</small>
+                </div>
+
+                <div class="card-fare">
+                    <p><strong>{{ bus.price | currency: '৳' }}</strong></p>
+                </div>
+
+                <div class="card-action">
+                    <a class="btn-view-seats" [routerLink]="['/seat-plan', bus.busScheduleId]">
+                        VIEW SEATS
+                    </a>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

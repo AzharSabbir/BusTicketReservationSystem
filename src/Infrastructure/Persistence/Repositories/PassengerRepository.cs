@@ -13,6 +13,5 @@ namespace Infrastructure.Persistence.Repositories
         public PassengerRepository(AppDbContext context) : base(context)
         {
         }
-        // We get AddAsync, GetByIdAsync, etc. for free from BaseRepository
     }
 }

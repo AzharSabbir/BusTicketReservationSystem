@@ -13,5 +13,9 @@ namespace Application.Contracts
         public List<SeatDto> Seats { get; set; } = new List<SeatDto>();
         public List<StopDto> BoardingPoints { get; set; } = new List<StopDto>();
         public List<StopDto> DroppingPoints { get; set; } = new List<StopDto>();
+        public decimal SeatFare { get; set; }      
+        public decimal ServiceCharge { get; set; }
+        public decimal PGWCharge { get; set; }
+        public decimal Discount { get; set; }
     }
 }

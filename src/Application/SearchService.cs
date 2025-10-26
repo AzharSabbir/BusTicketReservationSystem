@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application
 {
-    public class SearchService : ISearchService // 
+    public class SearchService : ISearchService 
     {
         private readonly IBusScheduleRepository _scheduleRepository;
         public SearchService(IBusScheduleRepository scheduleRepository)

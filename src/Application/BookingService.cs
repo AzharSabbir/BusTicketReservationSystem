@@ -64,9 +64,13 @@ namespace Application
                     SeatNumber = seat.SeatNumber,
                     Status = seat.Status.ToString()
                 }).ToList(),
+                BoardingPoints = boardingPoints, 
+                DroppingPoints = droppingPoints, 
 
-                BoardingPoints = boardingPoints,
-                DroppingPoints = droppingPoints
+                SeatFare = schedule.Price,           
+                ServiceCharge = schedule.ServiceCharge, 
+                PGWCharge = schedule.PGWCharge,       
+                Discount = schedule.Discount          
             };
 
             return seatPlanDto;
