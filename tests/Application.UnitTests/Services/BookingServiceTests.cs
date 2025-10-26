@@ -1,4 +1,4 @@
-﻿using Application; // Namespace for BookingService
+﻿using Application; 
 using Application.Contracts;
 using Application.Contracts.Persistence;
 using Domain;
@@ -15,7 +15,6 @@ namespace Application.UnitTests.Services
 {
     public class BookingServiceTests : IDisposable
     {
-        // Dependencies
         private readonly AppDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISeatRepository _seatRepository;
@@ -24,16 +23,14 @@ namespace Application.UnitTests.Services
         private readonly IBusScheduleRepository _busScheduleRepository;
         private readonly IStopRepository _stopRepository;
         private readonly SeatBookingService _seatBookingService;
-        private readonly IBookingService _bookingService; // Service under test
+        private readonly IBookingService _bookingService; 
 
-        // Seeded IDs
         private readonly Guid _scheduleId = Guid.Parse("b11c34a1-0e31-4ff5-9464-3e91501b8495");
         private readonly Guid _seatA1Id = Guid.Parse("a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1");
         private readonly Guid _seatA2Id = Guid.Parse("a2a2a2a2-a2a2-a2a2-a2a2-a2a2a2a2a2a2");
 
         public BookingServiceTests()
         {
-            // Arrange (Global): Create context and real dependencies
             _context = BusReservationDbContextFactory.Create();
             _unitOfWork = new UnitOfWork(_context);
             _seatRepository = new SeatRepository(_context);
@@ -51,21 +48,18 @@ namespace Application.UnitTests.Services
         [Fact]
         public async Task BookSeatAsync_Should_Succeed_ForAvailableSeat()
         {
-            // Arrange
             var input = new BookSeatInputDto
             {
                 BusScheduleId = _scheduleId,
-                SeatId = _seatA1Id, // A1 is available
+                SeatId = _seatA1Id, 
                 PassengerName = "Test User One",
                 PassengerMobile = "01111111111",
                 BoardingPoint = "[06:00 AM] Kallyanpur counter",
                 DroppingPoint = "[12:30 PM] Rajshahi Counter"
             };
 
-            // Act
             var result = await _bookingService.BookSeatAsync(input);
 
-            // Assert
             result.Success.ShouldBeTrue();
             result.Status.ShouldBe(SeatStatus.Booked.ToString());
             result.SeatNumber.ShouldBe("A1");
@@ -77,30 +71,26 @@ namespace Application.UnitTests.Services
         [Fact]
         public async Task BookSeatAsync_Should_Fail_ForAlreadyBookedSeat()
         {
-            // Arrange: Book seat A2 first
-            var firstInput = new BookSeatInputDto { BusScheduleId = _scheduleId, SeatId = _seatA2Id, /* other details */ PassengerName = "User A", PassengerMobile = "1", BoardingPoint = "B1", DroppingPoint = "D1" };
+            var firstInput = new BookSeatInputDto { BusScheduleId = _scheduleId, SeatId = _seatA2Id, PassengerName = "User A", PassengerMobile = "1", BoardingPoint = "B1", DroppingPoint = "D1" };
             await _bookingService.BookSeatAsync(firstInput);
 
-            // Arrange: Try to book A2 again
             var secondInput = new BookSeatInputDto
             {
                 BusScheduleId = _scheduleId,
-                SeatId = _seatA2Id, // A2 is now booked
+                SeatId = _seatA2Id, 
                 PassengerName = "Test User Two",
                 PassengerMobile = "02222222222",
                 BoardingPoint = "[06:15 AM] Mohakhali counter",
                 DroppingPoint = "[01:00 PM] Rajabari Counter"
             };
 
-            // Act
             var result = await _bookingService.BookSeatAsync(secondInput);
 
-            // Assert
             result.Success.ShouldBeFalse();
             result.Message.ShouldBe("This seat is not available for booking.");
             var seatInDb = await _context.Seats.FindAsync(_seatA2Id);
-            seatInDb?.Status.ShouldBe(SeatStatus.Booked); // Still booked by first user
-            _context.Tickets.Count().ShouldBe(1); // Only one ticket should exist
+            seatInDb?.Status.ShouldBe(SeatStatus.Booked); 
+            _context.Tickets.Count().ShouldBe(1);
         }
 
         public void Dispose()

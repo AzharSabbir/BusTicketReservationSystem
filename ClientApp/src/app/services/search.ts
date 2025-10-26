@@ -14,6 +14,10 @@ export interface AvailableBusDto {
   arrivalLocation: string;
   cancellationPolicy: string;
 }
+export interface RouteLocationsDto {
+  fromLocations: string[];
+  toLocations: string[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +36,8 @@ export class SearchService {
       .set('journeyDate', journeyDate);
 
     return this.http.get<AvailableBusDto[]>(`${this.apiUrl}/available-buses`, { params });
+  }
+  getLocations(): Observable<RouteLocationsDto> {
+    return this.http.get<RouteLocationsDto>(`${this.apiUrl}/locations`);
   }
 }

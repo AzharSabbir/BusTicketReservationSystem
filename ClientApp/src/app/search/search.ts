@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { SearchService, AvailableBusDto } from '../services/search';
+import { SearchService, AvailableBusDto, RouteLocationsDto } from '../services/search';
 
 @Component({
   selector: 'app-search',
@@ -11,10 +11,10 @@ import { SearchService, AvailableBusDto } from '../services/search';
   templateUrl: './search.html',
   styleUrls: ['./search.css']
 })
-export class SearchComponent {
+export class SearchComponent implements OnInit {
   searchModel = {
-    from: 'Dhaka',
-    to: 'Rajshahi',
+    from: '',
+    to: '',
     journeyDate: this.getTodayDateString()
   };
 
@@ -30,12 +30,45 @@ export class SearchComponent {
   currentSortCriteria = 'DEPARTURE TIME';
   sortAscending = true;
 
+  fromLocations: string[] = [];
+  toLocations: string[] = [];
+
   constructor(
     private searchService: SearchService,
     private router: Router
   ) { }
 
-  onSearchSubmit(form: NgForm) {
+  ngOnInit(): void {
+    this.loadLocations();
+  }
+
+  private loadLocations(): void {
+    this.isLoading = true;
+    this.searchService.getLocations().subscribe({
+      next: (data) => {
+        this.fromLocations = data.fromLocations;
+        this.toLocations = data.toLocations;
+        if (this.fromLocations.includes('Dhaka')) {
+          this.searchModel.from = 'Dhaka';
+        } else if (this.fromLocations.length > 0) {
+          this.searchModel.from = this.fromLocations[0];
+        }
+        if (this.toLocations.includes('Rajshahi')) {
+          this.searchModel.to = 'Rajshahi';
+        } else if (this.toLocations.length > 0) {
+          this.searchModel.to = this.toLocations[0];
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error("Error loading locations:", err);
+        this.searchError = 'Could not load locations. Please try refreshing.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onSearchSubmit(form: NgForm): void {
     if (form.invalid) {
       return;
     }
@@ -58,7 +91,7 @@ export class SearchComponent {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error(err);
+        console.error("Error searching buses:", err);
         this.searchError = 'An error occurred while searching. Please try again.';
         this.isLoading = false;
       }
@@ -66,6 +99,8 @@ export class SearchComponent {
   }
 
   sortResults(criteria: string, toggleDirection = true): void {
+    if (!this.searchResults || this.searchResults.length === 0) return;
+
     if (this.currentSortCriteria === criteria && toggleDirection) {
       this.sortAscending = !this.sortAscending;
     } else {
@@ -73,7 +108,7 @@ export class SearchComponent {
       this.sortAscending = true;
     }
 
-    this.searchResults.sort((a, b) => {
+    this.searchResults = [...this.searchResults].sort((a, b) => {
       let compare = 0;
       switch (criteria) {
         case 'DEPARTURE TIME':
@@ -94,9 +129,11 @@ export class SearchComponent {
     this.searchResults = [];
     this.hasSearched = false;
     this.totalBusesFound = 0;
-    console.log("Modify search clicked - clearing results for now.");
+    this.totalOperatorsFound = '--';
+    this.totalSeatsAvailable = '--';
+    this.searchError = null;
+    console.log("Modify search clicked - results cleared.");
   }
-
 
   private getTodayDateString(): string {
     const today = new Date();

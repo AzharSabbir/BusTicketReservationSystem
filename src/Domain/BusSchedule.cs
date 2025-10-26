@@ -28,19 +28,17 @@ namespace Domain
         private readonly List<Seat> _seats = new List<Seat>();
 
         private BusSchedule() { }
-
-        // --- REPLACE THIS CONSTRUCTOR ---
         public BusSchedule(
             Guid busId,
             Guid routeId,
             DateTime departureTime,
             DateTime arrivalTime,
-            decimal price, // Base price
+            decimal price, 
             string departureLocation,
             string arrivalLocation,
-            decimal serviceCharge, // << Add this
-            decimal pgwCharge,     // << Add this
-            decimal discount       // << Add this
+            decimal serviceCharge, 
+            decimal pgwCharge,     
+            decimal discount       
             )
         {
             BusId = busId;
@@ -50,11 +48,9 @@ namespace Domain
             Price = price;
             DepartureLocation = departureLocation;
             ArrivalLocation = arrivalLocation;
-            // --- ADD THESE ASSIGNMENTS ---
             ServiceCharge = serviceCharge;
             PGWCharge = pgwCharge;
             Discount = discount;
-            // --- END ADDITIONS ---
         }
 
         public void CreateSeats(int totalSeats)
