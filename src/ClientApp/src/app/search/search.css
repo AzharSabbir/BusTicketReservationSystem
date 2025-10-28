@@ -175,6 +175,14 @@ header {
     font-weight: bold;
 }
 
+.sort-option-dt {
+    margin-left: 100px;
+}
+
+.sort-option-f {
+    margin-left: 85px;
+}
+
 .btn-filter {
     border: 1px solid #ccc;
     background: white;
